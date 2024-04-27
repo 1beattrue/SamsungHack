@@ -1,7 +1,6 @@
 package edu.mirea.onebeattrue.samsunghack.data
 
 import android.app.Activity
-import android.util.Log
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -51,15 +50,7 @@ class AuthRepositoryImpl @Inject constructor(
 
         val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                firebaseAuth.signInWithCredential(credential)
-                    .addOnSuccessListener {
-                        Log.d("AuthRepositoryImpl", "signInWithCredential SUCCESS")
-                        //trySend(AuthState.Success)
-                    }
-                    .addOnFailureListener {
-                        Log.d("AuthRepositoryImpl", "signInWithCredential FAILURE")
-                        //trySend(AuthState.Failure(authExceptionMapper.mapFirebaseExceptionToAuthException(it)))
-                    }
+
             }
 
             override fun onVerificationFailed(e: FirebaseException) {
