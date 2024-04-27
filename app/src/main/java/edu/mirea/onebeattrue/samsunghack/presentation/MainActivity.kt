@@ -1,4 +1,4 @@
-package edu.mirea.onebeattrue.samsunghack
+package edu.mirea.onebeattrue.samsunghack.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,40 +6,33 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.arkivanov.decompose.defaultComponentContext
+import edu.mirea.onebeattrue.samsunghack.presentation.root.DefaultRootComponent
+import edu.mirea.onebeattrue.samsunghack.presentation.root.RootContent
 import edu.mirea.onebeattrue.samsunghack.ui.theme.SamsungHackTheme
+import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var rootComponentFactory: DefaultRootComponent.Factory
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        (application as SamsungHackApp).component.inject(this)
         super.onCreate(savedInstanceState)
+
+        val component = rootComponentFactory.create(defaultComponentContext())
+
         setContent {
             SamsungHackTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    RootContent(component = component)
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SamsungHackTheme {
-        Greeting("Android")
     }
 }

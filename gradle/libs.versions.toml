@@ -16,6 +16,9 @@ ksp = "1.9.21-1.0.15"
 dagger = "2.50"
 glide = "1.0.0-beta01"
 retrofit = "2.9.0"
+firebaseAuthKtx = "22.3.1"
+googleServices = "4.4.1"
+firebaseAuth = "22.3.1"
 
 
 [libraries]
@@ -48,6 +51,9 @@ glide-compose = { group = "com.github.bumptech.glide", name = "compose", version
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-gsonConverter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 icons = { group = "androidx.compose.material", name = "material-icons-extended" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+google-services = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -55,4 +61,6 @@ jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "k
 
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+
+
 

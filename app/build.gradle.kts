@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ksp)
     alias(libs.plugins.parcelize)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -61,6 +62,8 @@ dependencies {
     implementation(libs.glide.compose)
 
     implementation(libs.dagger.core)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.auth)
     ksp(libs.dagger.compiler)
 
     implementation(libs.room.core)

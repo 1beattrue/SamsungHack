@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "586378712171",
+    "project_id": "samsunghack-a2819",
+    "storage_bucket": "samsunghack-a2819.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:586378712171:android:60848b8a748b63c5124d2e",
+        "android_client_info": {
+          "package_name": "edu.mirea.onebeattrue.samsunghack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY-9tvvI3PtPyEloUoaYea0v7wI2cTQs8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
