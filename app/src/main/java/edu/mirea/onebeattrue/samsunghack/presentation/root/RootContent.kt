@@ -1,12 +1,19 @@
 package edu.mirea.onebeattrue.samsunghack.presentation.root
 
-import androidx.compose.material3.Text
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import edu.mirea.onebeattrue.samsunghack.R
 import edu.mirea.onebeattrue.samsunghack.presentation.auth.AuthContent
+import edu.mirea.onebeattrue.samsunghack.presentation.main.map.YandexMapActivity
 import edu.mirea.onebeattrue.samsunghack.presentation.onboarding.OnboardingContent
 
 @Composable
@@ -29,7 +36,8 @@ fun RootContent(
             }
 
             is RootComponent.Child.Main -> {
-                Text(text = "Главный экран")
+                LocalContext.current.startActivity(YandexMapActivity.createIntent(LocalContext.current))
+                (LocalContext.current as Activity).finish()
             }
         }
     }
