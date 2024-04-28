@@ -68,6 +68,8 @@ dependencies {
     implementation(libs.dagger.core)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.database)
+    implementation(libs.play.services.location)
     ksp(libs.dagger.compiler)
 
     implementation(libs.room.core)

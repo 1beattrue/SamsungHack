@@ -1,4 +1,4 @@
-package edu.mirea.onebeattrue.samsunghack.data
+package edu.mirea.onebeattrue.samsunghack.data.auth
 
 import android.app.Application
 import android.util.Log

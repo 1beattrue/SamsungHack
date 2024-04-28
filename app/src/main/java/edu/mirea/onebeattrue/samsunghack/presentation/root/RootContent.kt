@@ -13,6 +13,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import edu.mirea.onebeattrue.samsunghack.presentation.auth.AuthContent
+import edu.mirea.onebeattrue.samsunghack.presentation.map.MapContent
 import edu.mirea.onebeattrue.samsunghack.presentation.onboarding.OnboardingContent
 
 @Composable
@@ -34,21 +35,8 @@ fun RootContent(
                 OnboardingContent(component = instance.component)
             }
 
-            is RootComponent.Child.Main -> {
-                val singapore = LatLng(1.35, 103.87)
-                val cameraPositionState = rememberCameraPositionState {
-                    position = CameraPosition.fromLatLngZoom(singapore, 10f)
-                }
-                GoogleMap(
-                    modifier = Modifier.fillMaxSize(),
-                    cameraPositionState = cameraPositionState
-                ) {
-                    Marker(
-                        state = MarkerState(position = singapore),
-                        title = "Singapore",
-                        snippet = "Marker in Singapore"
-                    )
-                }
+            is RootComponent.Child.Map -> {
+                MapContent(component = instance.component)
             }
         }
     }

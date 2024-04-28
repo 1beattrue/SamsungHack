@@ -12,14 +12,14 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import edu.mirea.onebeattrue.samsunghack.domain.auth.AuthRepository
 import edu.mirea.onebeattrue.samsunghack.presentation.auth.DefaultAuthComponent
-import edu.mirea.onebeattrue.samsunghack.presentation.main.DefaultMainComponent
+import edu.mirea.onebeattrue.samsunghack.presentation.map.DefaultMapComponent
 import edu.mirea.onebeattrue.samsunghack.presentation.onboarding.DefaultOnboardingComponent
 import kotlinx.parcelize.Parcelize
 
 class DefaultRootComponent @AssistedInject constructor(
     private val onboardingComponentFactory: DefaultOnboardingComponent.Factory,
     private val authComponentFactory: DefaultAuthComponent.Factory,
-    private val mainComponentFactory: DefaultMainComponent.Factory,
+    private val mainComponentFactory: DefaultMapComponent.Factory,
     private val authRepository: AuthRepository,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : RootComponent, ComponentContext by componentContext {
@@ -29,7 +29,7 @@ class DefaultRootComponent @AssistedInject constructor(
     override val stack: Value<ChildStack<*, RootComponent.Child>>
         get() = childStack(
             source = navigation,
-            initialConfiguration = if (authRepository.currentUser == null) Config.Onboarding else Config.Main,
+            initialConfiguration = if (authRepository.currentUser == null) Config.Onboarding else Config.Map,
             handleBackButton = true,
             childFactory = ::child
         )
@@ -52,17 +52,17 @@ class DefaultRootComponent @AssistedInject constructor(
             val component = authComponentFactory.create(
                 componentContext = componentContext,
                 onLoggedIn = {
-                    navigation.replaceAll(Config.Main)
+                    navigation.replaceAll(Config.Map)
                 }
             )
             RootComponent.Child.Auth(component)
         }
 
-        Config.Main -> {
+        Config.Map -> {
             val component = mainComponentFactory.create(
                 componentContext = componentContext,
             )
-            RootComponent.Child.Main(component)
+            RootComponent.Child.Map(component)
         }
     }
 
@@ -74,7 +74,7 @@ class DefaultRootComponent @AssistedInject constructor(
         data object Auth : Config
 
         @Parcelize
-        data object Main : Config
+        data object Map : Config
     }
 
     @AssistedFactory
