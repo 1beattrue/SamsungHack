@@ -150,13 +150,13 @@ private fun Background(
             .padding(48.dp),
         painter = when (screenNumber) {
             0 -> if (isSystemInDarkTheme()) {
-                painterResource(id = R.drawable.screen_0)
+                painterResource(id = R.drawable.screen_0_dark_theme)
             } else {
                 painterResource(id = R.drawable.screen_0)
             }
 
             1 -> if (isSystemInDarkTheme()) {
-                painterResource(id = R.drawable.screen_1)
+                painterResource(id = R.drawable.screen_1_dark_theme)
             } else {
                 painterResource(id = R.drawable.screen_1)
             }
