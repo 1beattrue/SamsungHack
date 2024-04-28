@@ -93,7 +93,7 @@ fun MapContent(
         for (marker in state.points) {
             Marker(
                 onClick = {
-                    component.onOpenBottomSheet()
+                    component.onOpenBottomSheet(marker)
                     true
                 },
                 state = MarkerState(position = LatLng(
@@ -113,15 +113,7 @@ fun MapContent(
             },
             sheetState = sheetState
         ) {
-            Button(onClick = {
-                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                    if (!sheetState.isVisible) {
-                        component.onCloseBottomSheet()
-                    }
-                }
-            }) {
-                Text("Hide bottom sheet")
-            }
+
         }
     }
 }

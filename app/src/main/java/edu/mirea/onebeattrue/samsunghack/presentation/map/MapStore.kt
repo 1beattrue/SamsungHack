@@ -19,7 +19,7 @@ import javax.inject.Inject
 interface MapStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
-        data object OpenBottomSheet : Intent
+        data class OpenBottomSheet(val dbModel: DbModel) : Intent
         data object CloseBottomSheet : Intent
         data class ChangeCameraPosition(val cameraPosition: CameraPosition) : Intent
         data object GetPoints : Intent
@@ -28,7 +28,8 @@ interface MapStore : Store<Intent, State, Label> {
     data class State(
         val bottomSheetState: Boolean,
         val cameraPosition: CameraPosition,
-        val points: List<DbModel>
+        val points: List<DbModel>,
+        val bottomSheetModel: DbModel
     )
 
     sealed interface Label {
@@ -48,7 +49,12 @@ class MapStoreFactory @Inject constructor(
                 cameraPosition = CameraPosition.fromLatLngZoom(
                     LatLng(55.7558, 37.6173), 10f
                 ),
-                points = listOf()
+                points = listOf(),
+                bottomSheetModel = DbModel(
+                    latitude = 0.0,
+                    longitude = 0.0,
+                    measurements = listOf()
+                )
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = ::ExecutorImpl,
@@ -60,7 +66,7 @@ class MapStoreFactory @Inject constructor(
     }
 
     private sealed interface Msg {
-        data object OpenBottomSheet : Msg
+        data class OpenBottomSheet(val dbModel: DbModel) : Msg
         data object CloseBottomSheet : Msg
         data class ChangeCameraPosition(val cameraPosition: CameraPosition) : Msg
         data class PointsLoaded(val points: List<DbModel>) : Msg
@@ -77,8 +83,8 @@ class MapStoreFactory @Inject constructor(
     private inner class ExecutorImpl : CoroutineExecutor<Intent, Action, State, Msg, Label>() {
         override fun executeIntent(intent: Intent, getState: () -> State) {
             when (intent) {
-                Intent.OpenBottomSheet -> {
-                    dispatch(Msg.OpenBottomSheet)
+                is Intent.OpenBottomSheet -> {
+                    dispatch(Msg.OpenBottomSheet(intent.dbModel))
                 }
 
                 Intent.CloseBottomSheet -> {
@@ -109,9 +115,10 @@ class MapStoreFactory @Inject constructor(
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State =
             when (msg) {
-                Msg.OpenBottomSheet -> {
+                is Msg.OpenBottomSheet -> {
                     copy(
-                        bottomSheetState = true
+                        bottomSheetState = true,
+                        bottomSheetModel = msg.dbModel
                     )
                 }
 
