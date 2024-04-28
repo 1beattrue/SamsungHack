@@ -8,6 +8,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.DbModel
 import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.RealtimeDbRepository
 import edu.mirea.onebeattrue.samsunghack.presentation.map.MapStore.Intent
 import edu.mirea.onebeattrue.samsunghack.presentation.map.MapStore.Label
@@ -26,7 +27,8 @@ interface MapStore : Store<Intent, State, Label> {
 
     data class State(
         val bottomSheetState: Boolean,
-        val cameraPosition: CameraPosition
+        val cameraPosition: CameraPosition,
+        val points: List<DbModel>
     )
 
     sealed interface Label {
@@ -45,7 +47,8 @@ class MapStoreFactory @Inject constructor(
                 bottomSheetState = false,
                 cameraPosition = CameraPosition.fromLatLngZoom(
                     LatLng(55.7558, 37.6173), 10f
-                )
+                ),
+                points = listOf()
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = ::ExecutorImpl,
@@ -53,17 +56,21 @@ class MapStoreFactory @Inject constructor(
         ) {}
 
     private sealed interface Action {
+        data class GetPoints(val points: List<DbModel>) : Action
     }
 
     private sealed interface Msg {
         data object OpenBottomSheet : Msg
         data object CloseBottomSheet : Msg
         data class ChangeCameraPosition(val cameraPosition: CameraPosition) : Msg
-
+        data class PointsLoaded(val points: List<DbModel>) : Msg
     }
 
-    private class BootstrapperImpl : CoroutineBootstrapper<Action>() {
+    private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
         override fun invoke() {
+            scope.launch {
+                dispatch(Action.GetPoints(realtimeDbRepository.getPoints()))
+            }
         }
     }
 
@@ -84,13 +91,18 @@ class MapStoreFactory @Inject constructor(
 
                 Intent.GetPoints -> {
                     scope.launch {
-                        Log.d("MapStoreFactory", "${realtimeDbRepository.getPoints()}")
+                        realtimeDbRepository.getPoints()
                     }
                 }
             }
         }
 
         override fun executeAction(action: Action, getState: () -> State) {
+            when (action) {
+                is Action.GetPoints -> {
+                    dispatch(Msg.PointsLoaded(action.points))
+                }
+            }
         }
     }
 
@@ -112,6 +124,12 @@ class MapStoreFactory @Inject constructor(
                 is Msg.ChangeCameraPosition -> {
                     copy(
                         cameraPosition = msg.cameraPosition
+                    )
+                }
+
+                is Msg.PointsLoaded -> {
+                    copy(
+                        points = msg.points
                     )
                 }
             }
