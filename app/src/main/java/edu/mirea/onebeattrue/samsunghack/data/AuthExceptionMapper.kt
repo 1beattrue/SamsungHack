@@ -15,6 +15,7 @@ import javax.inject.Inject
 class AuthExceptionMapper @Inject constructor(
     private val application: Application
 ) {
+
     fun mapFirebaseExceptionToAuthException(exception: Exception): Exception {
         Log.d("AuthExceptionMapper", exception.javaClass.simpleName)
         return when (exception) {
