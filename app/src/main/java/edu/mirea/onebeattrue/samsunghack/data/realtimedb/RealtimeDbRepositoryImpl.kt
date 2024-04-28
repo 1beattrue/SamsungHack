@@ -17,8 +17,6 @@ class RealtimeDbRepositoryImpl @Inject constructor(
     private val dbReference: DatabaseReference
 ) : RealtimeDbRepository {
 
-    private var id = 0
-
     override suspend fun getPoints(): List<DbModel> {
         return suspendCancellableCoroutine { continuation ->
             dbReference.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -40,12 +38,12 @@ class RealtimeDbRepositoryImpl @Inject constructor(
                         val measurementSnapshotList = measurementsSnapshot.children.toList()
 
                         for (j in 0..<measurementSnapshotList.size - 1) {
-                            val measurementSnapshot = measurementSnapshotList[i]
+                            val measurementSnapshot = measurementSnapshotList[j]
                             val time = measurementSnapshot.child("time").getValue(String::class.java)
                                     .toString()
                             val value = measurementSnapshot.child("value").getValue(Double::class.java)
                                     .toString()
-                            measurements.add(Timestamp(id++, time, value))
+                            measurements.add(Timestamp(j, time, value))
                         }
                         points.add(DbModel(latitude, longitude, measurements))
                     }

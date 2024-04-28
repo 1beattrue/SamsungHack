@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -102,10 +103,11 @@ fun MapContent(
                     component.onOpenBottomSheet(marker)
                     true
                 },
-                state = MarkerState(position = LatLng(
-                    marker.latitude,
-                    marker.longitude
-                )
+                state = MarkerState(
+                    position = LatLng(
+                        marker.latitude,
+                        marker.longitude
+                    )
                 ),
                 title = "Singapore",
                 snippet = "Marker in Singapore"
@@ -120,9 +122,21 @@ fun MapContent(
             },
             sheetState = sheetState
         ) {
-            LazyColumn(
-
-            ) {
+            LazyColumn {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            modifier = Modifier.align(Alignment.CenterStart),
+                            text = "Время",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Text(
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                            text = "Значение датчика",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                }
                 items(items = state.bottomSheetModel.measurements, key = { it.id }) {
                     Box(modifier = Modifier.fillMaxWidth()) {
                         Text(
