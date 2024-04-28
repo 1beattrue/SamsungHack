@@ -90,15 +90,20 @@ fun MapContent(
         modifier = modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState
     ) {
-        Marker(
-            onClick = {
-                component.onOpenBottomSheet()
-                true
-            },
-            state = MarkerState(position = singapore),
-            title = "Singapore",
-            snippet = "Marker in Singapore"
-        )
+        for (marker in state.points) {
+            Marker(
+                onClick = {
+                    component.onOpenBottomSheet()
+                    true
+                },
+                state = MarkerState(position = LatLng(
+                    marker.latitude,
+                    marker.longitude
+                )),
+                title = "Singapore",
+                snippet = "Marker in Singapore"
+            )
+        }
     }
 
     if (state.bottomSheetState) {
