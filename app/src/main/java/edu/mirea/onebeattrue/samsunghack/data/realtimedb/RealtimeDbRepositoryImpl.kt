@@ -16,6 +16,9 @@ import kotlin.coroutines.resumeWithException
 class RealtimeDbRepositoryImpl @Inject constructor(
     private val dbReference: DatabaseReference
 ) : RealtimeDbRepository {
+
+    private var id = 0
+
     override suspend fun getPoints(): List<DbModel> {
         return suspendCancellableCoroutine { continuation ->
             dbReference.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -42,7 +45,7 @@ class RealtimeDbRepositoryImpl @Inject constructor(
                                     .toString()
                             val value = measurementSnapshot.child("value").getValue(Double::class.java)
                                     .toString()
-                            measurements.add(Timestamp(time, value))
+                            measurements.add(Timestamp(id++, time, value))
                         }
                         points.add(DbModel(latitude, longitude, measurements))
                     }

@@ -7,6 +7,7 @@ data class DbModel(
 )
 
 data class Timestamp(
+    val id: Int,
     val time: String,
     val value: String
 )

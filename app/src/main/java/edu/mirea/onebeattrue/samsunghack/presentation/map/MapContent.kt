@@ -6,7 +6,12 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListItemInfo
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -17,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
@@ -99,7 +105,8 @@ fun MapContent(
                 state = MarkerState(position = LatLng(
                     marker.latitude,
                     marker.longitude
-                )),
+                )
+                ),
                 title = "Singapore",
                 snippet = "Marker in Singapore"
             )
@@ -113,7 +120,22 @@ fun MapContent(
             },
             sheetState = sheetState
         ) {
+            LazyColumn(
 
+            ) {
+                items(items = state.bottomSheetModel.measurements, key = { it.id }) {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            modifier = Modifier.align(Alignment.CenterStart),
+                            text = it.time
+                        )
+                        Text(
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                            text = it.value
+                        )
+                    }
+                }
+            }
         }
     }
 }
