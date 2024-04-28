@@ -11,6 +11,6 @@ interface OnboardingComponent {
     fun goBack(currentScreenNumber: Int)
 
     companion object {
-        const val NUMBER_OF_SCREENS = 3
+        const val NUMBER_OF_SCREENS = 2
     }
 }

@@ -58,6 +58,8 @@ android {
 
 dependencies {
 
+    implementation(libs.constraint.layout)
+
     implementation(libs.yandex.maps)
 
     implementation(libs.icons)

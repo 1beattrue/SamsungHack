@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -16,10 +17,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -33,8 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
+import androidx.constraintlayout.compose.ConstraintLayout
 import edu.mirea.onebeattrue.samsunghack.R
 
 @Composable
@@ -44,47 +42,63 @@ fun OnboardingContent(
 ) {
     val state by component.model.collectAsState()
 
-    Box(
-        modifier = modifier.fillMaxSize()
+    ConstraintLayout(
+        modifier = modifier
     ) {
+        val (image, navigation) = createRefs()
 
         Background(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .constrainAs(image) {
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(navigation.top)
+                },
             screenNumber = state.screenNumber
         )
 
-        AnimatedVisibility(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp),
-            visible = state.isBackButtonVisible,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            OutlinedButton(
-                onClick = { component.goBack(state.screenNumber) },
-            ) {
-                Text(text = "Назад")
-            }
-        }
-
-        Button(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            onClick = { component.goNext(state.screenNumber) }
-        ) {
-            Text(text = "Далее")
-        }
-
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(32.dp),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.constrainAs(navigation) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                bottom.linkTo(parent.bottom)
+            }
         ) {
-            Indicators(size = OnboardingComponent.NUMBER_OF_SCREENS, index = state.screenNumber)
+
+            AnimatedVisibility(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp),
+                visible = state.isBackButtonVisible,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                OutlinedButton(
+                    onClick = { component.goBack(state.screenNumber) },
+                ) {
+                    Text(text = "Назад")
+                }
+            }
+
+            Button(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                onClick = { component.goNext(state.screenNumber) }
+            ) {
+                Text(text = "Далее")
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Indicators(size = OnboardingComponent.NUMBER_OF_SCREENS, index = state.screenNumber)
+            }
         }
     }
 }
@@ -125,7 +139,6 @@ private fun Indicator(isSelected: Boolean) {
     )
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun Background(
     modifier: Modifier = Modifier,
@@ -136,9 +149,23 @@ private fun Background(
             .fillMaxSize()
             .padding(48.dp),
         painter = when (screenNumber) {
-            0 -> painterResource(id = R.drawable.screen_0)
-            1 -> painterResource(id = R.drawable.screen_1)
-            else -> painterResource(id = R.drawable.screen_0)
+            0 -> if (isSystemInDarkTheme()) {
+                painterResource(id = R.drawable.screen_0)
+            } else {
+                painterResource(id = R.drawable.screen_0)
+            }
+
+            1 -> if (isSystemInDarkTheme()) {
+                painterResource(id = R.drawable.screen_1)
+            } else {
+                painterResource(id = R.drawable.screen_1)
+            }
+
+            else -> if (isSystemInDarkTheme()) {
+                painterResource(id = R.drawable.screen_0)
+            } else {
+                painterResource(id = R.drawable.screen_0)
+            }
         },
         contentDescription = null
     )
