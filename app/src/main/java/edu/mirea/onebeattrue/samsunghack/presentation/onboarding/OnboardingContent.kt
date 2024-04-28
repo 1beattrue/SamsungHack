@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,7 +31,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import edu.mirea.onebeattrue.samsunghack.R
 
 @Composable
 fun OnboardingContent(
@@ -43,6 +48,10 @@ fun OnboardingContent(
         modifier = modifier.fillMaxSize()
     ) {
 
+        Background(
+            modifier = Modifier.fillMaxSize(),
+            screenNumber = state.screenNumber
+        )
 
         AnimatedVisibility(
             modifier = Modifier
@@ -116,23 +125,31 @@ private fun Indicator(isSelected: Boolean) {
     )
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun Background(
     modifier: Modifier = Modifier,
     screenNumber: Int
 ) {
-    Box(
+    Image(
         modifier = modifier
-            .fillMaxWidth()
-            .sizeIn(minHeight = 400.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color.Blue),
+            .fillMaxSize()
+            .padding(48.dp),
+        painter = when (screenNumber) {
+            0 -> painterResource(id = R.drawable.screen_0)
+            1 -> painterResource(id = R.drawable.screen_1)
+            else -> painterResource(id = R.drawable.screen_0)
+        },
+        contentDescription = null
+    )
+//    GlideImage(
+//        modifier = modifier
+//            .fillMaxSize(),
 //        model = when (screenNumber) {
-//            0 -> null
-//            1 -> null
-//            2 -> null
+//            0 -> painterResource(id = R.drawable.screen_0)
+//            1 -> painterResource(id = R.drawable.screen_1)
 //            else -> null
 //        },
 //        contentDescription = null
-    )
+//    )
 }
