@@ -1,6 +1,7 @@
 package edu.mirea.onebeattrue.samsunghack.data.realtimedb
 
 import android.util.Log
+import androidx.compose.ui.graphics.Color
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -59,8 +60,8 @@ class RealtimeDbRepositoryImpl @Inject constructor(
                                     .formattedTime()
                             val value =
                                 dataSnapshot.child("value").getValue(Double::class.java)
-                                    .formattedValue()
-                            timestamps.add(Timestamp(index, time, value))
+                            val color = getColor(value)
+                            timestamps.add(Timestamp(index, time, value.formattedValue(), color))
                         }
                     }
                     Log.d("RealtimeDbRepositoryImpl", "$timestamps")
@@ -72,6 +73,13 @@ class RealtimeDbRepositoryImpl @Inject constructor(
                 }
             })
         }
+    }
+
+    private fun getColor(value: Double?): Color {
+        return if (value == null) Color.Red
+        else if (value > 5 && value < 10) Color.Yellow
+        else if (value >= 10) Color.Red
+        else Color.Green
     }
 
     private fun <T> T.formattedValue(): String {

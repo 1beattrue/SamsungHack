@@ -36,9 +36,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -51,7 +51,6 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import edu.mirea.onebeattrue.samsunghack.ui.theme.CORNER_RADIUS_CONTAINER
-import edu.mirea.onebeattrue.samsunghack.ui.theme.SamsungHackTheme
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -168,7 +167,7 @@ fun MapContent(
                 items(
                     items = state.timestamps.reversed(), key = { it.id }
                 ) {
-                    TimestampItem(time = it.time, value = it.value)
+                    TimestampItem(time = it.time, value = it.value, color = it.color)
                 }
             }
         }
@@ -179,7 +178,8 @@ fun MapContent(
 private fun TimestampItem(
     modifier: Modifier = Modifier,
     time: String,
-    value: String
+    value: String,
+    color: Color
 ) {
     Card(
         modifier = modifier
@@ -221,28 +221,18 @@ private fun TimestampItem(
                     fontWeight = FontWeight.Bold
                 )
 
-                Text(text = value)
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.DarkGray,
+                        contentColor = color
+                    )
+                ) {
+                    Text(
+                        modifier = Modifier.padding(8.dp),
+                        text = value,
+                    )
+                }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun TimestampItemPreview() {
-    TimestampItem(
-        time = "TimestampItem",
-        value = "5"
-    )
-}
-
-@Preview
-@Composable
-private fun TimestampItemPreviewDark() {
-    SamsungHackTheme(darkTheme = true) {
-        TimestampItem(
-            time = "TimestampItem",
-            value = "5"
-        )
     }
 }
