@@ -61,6 +61,9 @@ class DefaultRootComponent @AssistedInject constructor(
         Config.Map -> {
             val component = mainComponentFactory.create(
                 componentContext = componentContext,
+                onLogOut = {
+                    navigation.replaceAll(Config.Auth)
+                }
             )
             RootComponent.Child.Map(component)
         }

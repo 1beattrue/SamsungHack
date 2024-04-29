@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
+import edu.mirea.onebeattrue.samsunghack.domain.auth.AuthRepository
 import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.Point
 import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.RealtimeDbRepository
 import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.Timestamp
@@ -19,6 +20,7 @@ interface MapStore : Store<Intent, State, Label> {
     sealed interface Intent {
         data class OpenBottomSheet(val key: String) : Intent
         data object CloseBottomSheet : Intent
+        data object LogOut : Intent
     }
 
     data class State(
@@ -30,12 +32,14 @@ interface MapStore : Store<Intent, State, Label> {
     )
 
     sealed interface Label {
+        data object LogOut : Label
     }
 }
 
 class MapStoreFactory @Inject constructor(
     private val storeFactory: StoreFactory,
-    private val realtimeDbRepository: RealtimeDbRepository
+    private val realtimeDbRepository: RealtimeDbRepository,
+    private val authRepository: AuthRepository
 ) {
 
     fun create(): MapStore =
@@ -87,6 +91,11 @@ class MapStoreFactory @Inject constructor(
 
                 Intent.CloseBottomSheet -> {
                     dispatch(Msg.CloseBottomSheet)
+                }
+
+                Intent.LogOut -> {
+                    authRepository.signOut()
+                    publish(Label.LogOut)
                 }
             }
         }

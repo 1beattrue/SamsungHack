@@ -8,4 +8,6 @@ interface MapComponent {
     fun onOpenBottomSheet(key: String)
 
     fun onCloseBottomSheet()
+
+    fun logOut()
 }
