@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CustomCard(
     modifier: Modifier = Modifier,
-    elevation: Dp,
+    elevation: Dp = 0.dp,
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(
