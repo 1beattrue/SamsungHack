@@ -3,7 +3,6 @@ package edu.mirea.onebeattrue.samsunghack.presentation.map
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
-import com.google.android.gms.maps.model.CameraPosition
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -29,10 +28,6 @@ class DefaultMapComponent @AssistedInject constructor(
 
     override fun onCloseBottomSheet() {
         store.accept(MapStore.Intent.CloseBottomSheet)
-    }
-
-    override fun onChangeCameraPosition(cameraPosition: CameraPosition) {
-        store.accept(MapStore.Intent.ChangeCameraPosition(cameraPosition))
     }
 
     @AssistedFactory

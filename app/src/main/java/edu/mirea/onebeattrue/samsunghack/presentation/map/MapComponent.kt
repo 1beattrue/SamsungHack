@@ -1,6 +1,5 @@
 package edu.mirea.onebeattrue.samsunghack.presentation.map
 
-import com.google.android.gms.maps.model.CameraPosition
 import kotlinx.coroutines.flow.StateFlow
 
 interface MapComponent {
@@ -9,6 +8,4 @@ interface MapComponent {
     fun onOpenBottomSheet(key: String)
 
     fun onCloseBottomSheet()
-
-    fun onChangeCameraPosition(cameraPosition: CameraPosition)
 }

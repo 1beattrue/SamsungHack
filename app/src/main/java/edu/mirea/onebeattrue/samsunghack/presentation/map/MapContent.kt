@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -50,8 +52,9 @@ fun MapContent(
     val state by component.model.collectAsState()
 
     val sheetState = rememberModalBottomSheetState()
+    val moscow = LatLng(1.35, 103.87)
     val cameraPositionState = rememberCameraPositionState {
-        position = state.cameraPosition
+        position = CameraPosition.fromLatLngZoom(moscow, 10f)
     }
 
     val context = LocalContext.current
@@ -61,9 +64,24 @@ fun MapContent(
     val permissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
-
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    location?.let {
+                        val userLocation = LatLng(location.latitude, location.longitude)
+                        Log.d("MapContent", "$userLocation")
+                        cameraPositionState.move(
+                            CameraUpdateFactory.newLatLngZoom(
+                                userLocation,
+                                15f
+                            )
+                        )
+                    }
+                }
             } else {
-
+                Toast.makeText(
+                    context,
+                    "Разрешение на использование геопозиции отклонено",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -77,12 +95,7 @@ fun MapContent(
                 location?.let {
                     val userLocation = LatLng(location.latitude, location.longitude)
                     Log.d("MapContent", "$userLocation")
-                    component.onChangeCameraPosition(
-                        CameraPosition.fromLatLngZoom(
-                            userLocation,
-                            10f
-                        )
-                    )
+                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
                 }
             }
         } else {
@@ -113,7 +126,9 @@ fun MapContent(
         }
         AnimatedVisibility(
             visible = state.isLoading,
-            modifier = Modifier.align(Alignment.TopCenter).padding(8.dp)
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(8.dp)
         ) {
             CircularProgressIndicator()
         }

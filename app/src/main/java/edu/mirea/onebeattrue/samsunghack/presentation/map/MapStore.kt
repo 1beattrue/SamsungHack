@@ -5,8 +5,6 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
 import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.Point
 import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.RealtimeDbRepository
 import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.Timestamp
@@ -21,14 +19,12 @@ interface MapStore : Store<Intent, State, Label> {
     sealed interface Intent {
         data class OpenBottomSheet(val key: String) : Intent
         data object CloseBottomSheet : Intent
-        data class ChangeCameraPosition(val cameraPosition: CameraPosition) : Intent
     }
 
     data class State(
         val isTimestampsLoading: Boolean,
         val isLoading: Boolean,
         val bottomSheetState: Boolean,
-        val cameraPosition: CameraPosition,
         val points: List<Point>,
         val timestamps: List<Timestamp>
     )
@@ -49,9 +45,6 @@ class MapStoreFactory @Inject constructor(
                 isTimestampsLoading = false,
                 isLoading = true,
                 bottomSheetState = false,
-                cameraPosition = CameraPosition.fromLatLngZoom(
-                    LatLng(55.7558, 37.6173), 10f
-                ),
                 points = listOf(),
                 timestamps = listOf()
             ),
@@ -68,7 +61,6 @@ class MapStoreFactory @Inject constructor(
         data object TimestampsLoading : Msg
         data class OpenBottomSheet(val key: String) : Msg
         data object CloseBottomSheet : Msg
-        data class ChangeCameraPosition(val cameraPosition: CameraPosition) : Msg
         data class PointsLoaded(val points: List<Point>) : Msg
         data class TimestampsLoaded(val timestamps: List<Timestamp>) : Msg
     }
@@ -96,10 +88,6 @@ class MapStoreFactory @Inject constructor(
                 Intent.CloseBottomSheet -> {
                     dispatch(Msg.CloseBottomSheet)
                 }
-
-                is Intent.ChangeCameraPosition -> {
-                    dispatch(Msg.ChangeCameraPosition(intent.cameraPosition))
-                }
             }
         }
 
@@ -115,9 +103,6 @@ class MapStoreFactory @Inject constructor(
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State =
             when (msg) {
-                is Msg.ChangeCameraPosition -> {
-                    copy()
-                }
 
                 Msg.CloseBottomSheet -> {
                     copy(bottomSheetState = false, timestamps = listOf())
