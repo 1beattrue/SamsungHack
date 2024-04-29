@@ -1,6 +1,5 @@
 package edu.mirea.onebeattrue.samsunghack.presentation.map
 
-import android.util.Log
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
@@ -8,8 +7,9 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.DbModel
+import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.Point
 import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.RealtimeDbRepository
+import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.Timestamp
 import edu.mirea.onebeattrue.samsunghack.presentation.map.MapStore.Intent
 import edu.mirea.onebeattrue.samsunghack.presentation.map.MapStore.Label
 import edu.mirea.onebeattrue.samsunghack.presentation.map.MapStore.State
@@ -19,17 +19,18 @@ import javax.inject.Inject
 interface MapStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
-        data class OpenBottomSheet(val dbModel: DbModel) : Intent
+        data class OpenBottomSheet(val key: String) : Intent
         data object CloseBottomSheet : Intent
         data class ChangeCameraPosition(val cameraPosition: CameraPosition) : Intent
-        data object GetPoints : Intent
     }
 
     data class State(
+        val isTimestampsLoading: Boolean,
+        val isLoading: Boolean,
         val bottomSheetState: Boolean,
         val cameraPosition: CameraPosition,
-        val points: List<DbModel>,
-        val bottomSheetModel: DbModel
+        val points: List<Point>,
+        val timestamps: List<Timestamp>
     )
 
     sealed interface Label {
@@ -45,16 +46,14 @@ class MapStoreFactory @Inject constructor(
         object : MapStore, Store<Intent, State, Label> by storeFactory.create(
             name = "MapStore",
             initialState = State(
+                isTimestampsLoading = false,
+                isLoading = true,
                 bottomSheetState = false,
                 cameraPosition = CameraPosition.fromLatLngZoom(
                     LatLng(55.7558, 37.6173), 10f
                 ),
                 points = listOf(),
-                bottomSheetModel = DbModel(
-                    latitude = 0.0,
-                    longitude = 0.0,
-                    measurements = listOf()
-                )
+                timestamps = listOf()
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = ::ExecutorImpl,
@@ -62,14 +61,16 @@ class MapStoreFactory @Inject constructor(
         ) {}
 
     private sealed interface Action {
-        data class GetPoints(val points: List<DbModel>) : Action
+        data class GetPoints(val points: List<Point>) : Action
     }
 
     private sealed interface Msg {
-        data class OpenBottomSheet(val dbModel: DbModel) : Msg
+        data object TimestampsLoading : Msg
+        data class OpenBottomSheet(val key: String) : Msg
         data object CloseBottomSheet : Msg
         data class ChangeCameraPosition(val cameraPosition: CameraPosition) : Msg
-        data class PointsLoaded(val points: List<DbModel>) : Msg
+        data class PointsLoaded(val points: List<Point>) : Msg
+        data class TimestampsLoaded(val timestamps: List<Timestamp>) : Msg
     }
 
     private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
@@ -84,7 +85,12 @@ class MapStoreFactory @Inject constructor(
         override fun executeIntent(intent: Intent, getState: () -> State) {
             when (intent) {
                 is Intent.OpenBottomSheet -> {
-                    dispatch(Msg.OpenBottomSheet(intent.dbModel))
+                    dispatch(Msg.OpenBottomSheet(intent.key))
+                    scope.launch {
+                        dispatch(Msg.TimestampsLoading)
+                        val timestamps = realtimeDbRepository.getTimestamps(intent.key)
+                        dispatch(Msg.TimestampsLoaded(timestamps))
+                    }
                 }
 
                 Intent.CloseBottomSheet -> {
@@ -93,12 +99,6 @@ class MapStoreFactory @Inject constructor(
 
                 is Intent.ChangeCameraPosition -> {
                     dispatch(Msg.ChangeCameraPosition(intent.cameraPosition))
-                }
-
-                Intent.GetPoints -> {
-                    scope.launch {
-                        realtimeDbRepository.getPoints()
-                    }
                 }
             }
         }
@@ -115,32 +115,30 @@ class MapStoreFactory @Inject constructor(
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State =
             when (msg) {
-                is Msg.OpenBottomSheet -> {
-                    copy(
-                        bottomSheetState = true,
-                        bottomSheetModel = msg.dbModel
-                    )
+                is Msg.ChangeCameraPosition -> {
+                    copy()
                 }
 
                 Msg.CloseBottomSheet -> {
-                    copy(
-                        bottomSheetState = false
-                    )
+                    copy(bottomSheetState = false, timestamps = listOf())
                 }
 
-                is Msg.ChangeCameraPosition -> {
-                    copy(
-                        cameraPosition = msg.cameraPosition
-                    )
+                is Msg.OpenBottomSheet -> {
+                    copy(bottomSheetState = true)
                 }
 
                 is Msg.PointsLoaded -> {
-                    copy(
-                        points = msg.points
-                    )
+                    copy(isLoading = false, points = msg.points)
+                }
+
+                Msg.TimestampsLoading -> {
+                    copy(isTimestampsLoading = true)
+                }
+
+                is Msg.TimestampsLoaded -> {
+                    copy(isTimestampsLoading = false, timestamps = msg.timestamps)
                 }
             }
-
 
     }
 }

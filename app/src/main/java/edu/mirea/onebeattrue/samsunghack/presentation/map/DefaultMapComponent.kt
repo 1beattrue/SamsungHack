@@ -7,7 +7,6 @@ import com.google.android.gms.maps.model.CameraPosition
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import edu.mirea.onebeattrue.samsunghack.domain.realtimedb.DbModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 
@@ -24,8 +23,8 @@ class DefaultMapComponent @AssistedInject constructor(
         get() = store.stateFlow
 
 
-    override fun onOpenBottomSheet(dbModel: DbModel) {
-        store.accept(MapStore.Intent.OpenBottomSheet(dbModel))
+    override fun onOpenBottomSheet(key: String) {
+        store.accept(MapStore.Intent.OpenBottomSheet(key))
     }
 
     override fun onCloseBottomSheet() {
@@ -34,10 +33,6 @@ class DefaultMapComponent @AssistedInject constructor(
 
     override fun onChangeCameraPosition(cameraPosition: CameraPosition) {
         store.accept(MapStore.Intent.ChangeCameraPosition(cameraPosition))
-    }
-
-    override fun getPoints() {
-        store.accept(MapStore.Intent.GetPoints)
     }
 
     @AssistedFactory

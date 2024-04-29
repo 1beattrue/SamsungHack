@@ -1,9 +1,9 @@
 package edu.mirea.onebeattrue.samsunghack.domain.realtimedb
 
-data class DbModel(
+data class Point(
+    val key: String,
     val latitude: Double,
-    val longitude: Double,
-    val measurements: List<Timestamp>
+    val longitude: Double
 )
 
 data class Timestamp(

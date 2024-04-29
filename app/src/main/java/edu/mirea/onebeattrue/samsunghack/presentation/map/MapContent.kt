@@ -6,14 +6,18 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -22,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -47,14 +50,9 @@ fun MapContent(
     val state by component.model.collectAsState()
 
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-
-    val singapore = LatLng(1.35, 103.87)
     val cameraPositionState = rememberCameraPositionState {
         position = state.cameraPosition
     }
-
-    component.getPoints()
 
     val context = LocalContext.current
     val fusedLocationClient: FusedLocationProviderClient =
@@ -92,27 +90,35 @@ fun MapContent(
         }
     }
 
-    GoogleMap(
-        modifier = modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState
-    ) {
-        for (marker in state.points) {
-            Marker(
-                onClick = {
-                    component.onOpenBottomSheet(marker)
-                    true
-                },
-                state = MarkerState(
-                    position = LatLng(
-                        marker.latitude,
-                        marker.longitude
-                    )
-                ),
-                title = "Singapore",
-                snippet = "Marker in Singapore"
-            )
+    Box(modifier = modifier.fillMaxSize()) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState
+        ) {
+            for (marker in state.points) {
+                Marker(
+                    onClick = {
+                        component.onOpenBottomSheet(marker.key)
+                        true
+                    },
+                    state = MarkerState(
+                        position = LatLng(
+                            marker.latitude,
+                            marker.longitude
+                        )
+                    ),
+                    title = "Measurement"
+                )
+            }
+        }
+        AnimatedVisibility(
+            visible = state.isLoading,
+            modifier = Modifier.align(Alignment.TopCenter).padding(8.dp)
+        ) {
+            CircularProgressIndicator()
         }
     }
+
 
     if (state.bottomSheetState) {
         ModalBottomSheet(
@@ -123,28 +129,47 @@ fun MapContent(
         ) {
             LazyColumn {
                 item {
-                    Box(modifier = Modifier.fillMaxWidth()) {
+                    AnimatedVisibility(
+                        modifier = Modifier.fillMaxWidth(),
+                        visible = state.isTimestampsLoading,
+                    ) {
+                        LinearProgressIndicator()
+                    }
+                }
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Text(
-                            modifier = Modifier.align(Alignment.CenterStart),
+                            modifier = Modifier.weight(0.5f),
                             text = "Время",
-                            style = MaterialTheme.typography.titleLarge
+                            style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            modifier = Modifier.align(Alignment.CenterEnd),
+                            modifier = Modifier.weight(0.5f),
                             text = "Значение датчика",
-                            style = MaterialTheme.typography.titleLarge
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
                 }
-                items(items = state.bottomSheetModel.measurements.reversed(), key = { it.id }) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Box(modifier = Modifier.fillMaxWidth()) {
+                items(
+                    items = state.timestamps.reversed(), key = { it.id }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Text(
-                            modifier = Modifier.align(Alignment.CenterStart),
+                            modifier = Modifier.weight(0.5f),
                             text = it.time
                         )
                         Text(
-                            modifier = Modifier.align(Alignment.CenterEnd),
+                            modifier = Modifier.weight(0.5f),
                             text = it.value
                         )
                     }

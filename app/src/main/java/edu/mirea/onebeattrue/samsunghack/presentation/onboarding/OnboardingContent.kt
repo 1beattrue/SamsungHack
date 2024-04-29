@@ -173,8 +173,8 @@ private fun Background(
 //        modifier = modifier
 //            .fillMaxSize(),
 //        model = when (screenNumber) {
-//            0 -> painterResource(id = R.drawable.screen_0)
-//            1 -> painterResource(id = R.drawable.screen_1)
+//            0 -> painterResource(key = R.drawable.screen_0)
+//            1 -> painterResource(key = R.drawable.screen_1)
 //            else -> null
 //        },
 //        contentDescription = null
